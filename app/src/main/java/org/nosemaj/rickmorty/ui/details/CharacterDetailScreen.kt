@@ -11,16 +11,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.nosemaj.rickmorty.ui.details.UiState.Content
 import org.nosemaj.rickmorty.ui.details.UiState.Error
@@ -40,7 +39,7 @@ fun CharacterDetailScreen(
     LaunchedEffect(key1 = true) {
         viewModel.onEvent(UiEvent.InitialLoad(characterId))
     }
-    val viewState by viewModel.uiState.collectAsState()
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentState = viewState) {
         is Loading -> LoadingUI()
         is Content -> CharacterDetailUi(currentState.characterDetail) {
@@ -87,9 +86,8 @@ fun CharacterDetailUi(
 fun TitleLine(text: String) {
     Text(
         text = text,
-        fontSize = 40.sp,
-        fontWeight = FontWeight.ExtraBold,
-        lineHeight = 40.sp,
+        style = MaterialTheme.typography.headlineLarge,
+        modifier = Modifier.padding(vertical = 16.dp)
     )
 }
 
@@ -97,10 +95,7 @@ fun TitleLine(text: String) {
 fun DetailLine(text: String) {
     Text(
         text = text,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 20.sp,
-        modifier = Modifier.fillMaxWidth()
+        style = MaterialTheme.typography.titleLarge,
     )
 }
 

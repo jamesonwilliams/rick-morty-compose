@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Modifier
@@ -21,6 +20,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign.Companion.Right
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.nosemaj.rickmorty.ui.list.UiEvent.BottomReached
 import org.nosemaj.rickmorty.ui.list.UiEvent.InitialLoad
@@ -39,7 +39,7 @@ fun CharacterListScreen(
     LaunchedEffect(key1 = true) {
         viewModel.onEvent(InitialLoad)
     }
-    val viewState by viewModel.uiState.collectAsState()
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     when (viewState.displayState) {
         DisplayState.LOADING -> {
             LoadingUI()
