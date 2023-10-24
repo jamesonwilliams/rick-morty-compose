@@ -1,4 +1,4 @@
-package org.nosemaj.rickmorty.ui
+package org.nosemaj.rickmorty.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.nosemaj.rickmorty.data.CharacterListResponse
 import org.nosemaj.rickmorty.data.RickAndMortyDataSource
 import org.nosemaj.rickmorty.data.RickAndMortyDataSource.DataState
 import org.nosemaj.rickmorty.data.RickAndMortyService
-import org.nosemaj.rickmorty.ui.UiEvent.BottomReached
-import org.nosemaj.rickmorty.ui.UiEvent.InitialLoad
-import org.nosemaj.rickmorty.ui.UiEvent.RetryClicked
+import org.nosemaj.rickmorty.ui.list.UiEvent.BottomReached
+import org.nosemaj.rickmorty.ui.list.UiEvent.InitialLoad
+import org.nosemaj.rickmorty.ui.list.UiEvent.RetryClicked
 
 class CharacterListViewModel(
     private val rickAndMortyDataSource: RickAndMortyDataSource,
@@ -40,17 +41,17 @@ class CharacterListViewModel(
                 rickAndMortyDataSource.listCharacters(uiState.value.currentPage)
             }
             when (dataState) {
-                is DataState.Error -> {
+                is DataState.Error<CharacterListResponse> -> {
                     _uiState.update {
                         it.copy(displayState = DisplayState.ERROR, errorMessage = dataState.reason)
                     }
                 }
-                is DataState.Content -> {
-                    val characters = dataState.characters
-                        .map { Character(name = it.name, imageUrl = it.image) }
+                is DataState.Content<CharacterListResponse> -> {
+                    val characterSummaries = dataState.data.results
+                        .map { CharacterSummary(id = it.id, name = it.name, imageUrl = it.image) }
                     _uiState.update {
                         it.copy(
-                            characters = it.characters.plus(characters),
+                            characterSummaries = it.characterSummaries.plus(characterSummaries),
                             displayState = DisplayState.CONTENT,
                             currentPage = it.currentPage + 1,
                         )
@@ -78,16 +79,17 @@ sealed class UiEvent {
 
     object BottomReached: UiEvent()
 }
+
 data class UiState(
     val currentPage: Int,
-    val characters: List<Character>,
+    val characterSummaries: List<CharacterSummary>,
     val displayState: DisplayState,
     val errorMessage: String?,
 ) {
     companion object {
         val INITIAL = UiState(
             currentPage = 1,
-            characters = emptyList(),
+            characterSummaries = emptyList(),
             displayState = DisplayState.LOADING,
             errorMessage = null,
         )
@@ -101,7 +103,8 @@ enum class DisplayState {
     ;
 }
 
-data class Character(
+data class CharacterSummary(
+    val id: Int,
     val name: String,
     val imageUrl: String,
 )

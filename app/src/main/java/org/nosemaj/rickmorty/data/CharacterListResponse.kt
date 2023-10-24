@@ -6,7 +6,7 @@ package org.nosemaj.rickmorty.data
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CharacterResponse(
+data class CharacterListResponse(
     val info: Info,
     val results: List<Character>
 ) {
