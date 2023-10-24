@@ -1,20 +1,12 @@
-package org.nosemaj.rickmorty.data
+package org.nosemaj.rickmorty.data.net
 
+import android.util.Log
+import org.nosemaj.rickmorty.data.DataState
 import retrofit2.Response
 
-class RickAndMortyDataSource(
+class NetworkCharacterDataSource(
     private val service: RickAndMortyService,
 ) {
-
-    suspend fun getCharacter(characterId: Int): DataState<CharacterListResponse.Character> {
-        return fetch(
-            "Couldn't get character $characterId.",
-            "Error retrieving character $characterId.",
-        ) {
-            service.getCharacter(characterId)
-        }
-    }
-
     suspend fun listCharacters(page: Int): DataState<CharacterListResponse> {
         return fetch(
             "No more characters found.",
@@ -34,19 +26,18 @@ class RickAndMortyDataSource(
             if (response.isSuccessful) {
                 response.body()?.let { data ->
                     DataState.Content(data)
-                } ?: DataState.Error(noDataMessage)
+                } ?: DataState.Error(
+                    Throwable(noDataMessage)
+                )
             } else {
-                DataState.Error(unsuccessfulMessage)
+                DataState.Error(
+                    Throwable(unsuccessfulMessage)
+                )
             }
         } catch (thr: Throwable) {
-            val message = thr.message ?: thr.cause?.message ?: "Bad network connectivity."
-            DataState.Error(message)
+            DataState.Error(
+                Throwable("Bad network connectivity.", thr)
+            )
         }
-    }
-
-    sealed class DataState<T> {
-        data class Content<T>(val data: T): DataState<T>()
-
-        data class Error<T>(val reason: String): DataState<T>()
     }
 }

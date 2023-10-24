@@ -35,7 +35,7 @@ fun CharacterDetailScreen(
     onBackPressed: () -> Unit,
 ) {
     val viewModel: CharacterDetailViewModel = viewModel(
-        factory = CharacterDetailViewModel.Factory()
+        factory = CharacterDetailViewModel.Factory,
     )
     LaunchedEffect(key1 = true) {
         viewModel.onEvent(UiEvent.InitialLoad(characterId))

@@ -1,4 +1,4 @@
-package org.nosemaj.rickmorty.data
+package org.nosemaj.rickmorty.data.net
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -11,12 +11,8 @@ import retrofit2.http.Query
 
 
 interface RickAndMortyService {
-
-    @GET("character/{characterId}")
-    suspend fun getCharacter(@Path("characterId") characterId: Int): Response<CharacterListResponse.Character>
-
     @GET("character")
-    suspend fun listCharacters(@Query("page") page: Int = 0): Response<CharacterListResponse>
+    suspend fun listCharacters(@Query("page") page: Int): Response<CharacterListResponse>
 
     companion object {
         fun create(baseUrl: String = "https://rickandmortyapi.com/api/"): RickAndMortyService {

@@ -1,8 +1,11 @@
 package org.nosemaj.rickmorty.ui.details
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,15 +13,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.nosemaj.rickmorty.data.CharacterListResponse
-import org.nosemaj.rickmorty.data.RickAndMortyDataSource
-import org.nosemaj.rickmorty.data.RickAndMortyDataSource.DataState
-import org.nosemaj.rickmorty.data.RickAndMortyService
+import org.nosemaj.rickmorty.data.CharacterRepository
+import org.nosemaj.rickmorty.data.DataState
+import org.nosemaj.rickmorty.data.db.DbCharacterDataSource
+import org.nosemaj.rickmorty.data.net.NetworkCharacterDataSource
+import org.nosemaj.rickmorty.data.net.RickAndMortyService
 import org.nosemaj.rickmorty.ui.details.UiEvent.InitialLoad
 import org.nosemaj.rickmorty.ui.details.UiState.Loading
 
 class CharacterDetailViewModel(
-    private val dataSource: RickAndMortyDataSource,
+    private val characterRepository: CharacterRepository,
 ): ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -33,10 +37,10 @@ class CharacterDetailViewModel(
     private fun loadCharacter(characterId: Int) {
         viewModelScope.launch {
             val dataState = withContext(Dispatchers.IO) {
-                dataSource.getCharacter(characterId = characterId)
+                characterRepository.getCharacter(characterId = characterId)
             }
             when (dataState) {
-                is DataState.Content<CharacterListResponse.Character> -> {
+                is DataState.Content<CharacterRepository.Character> -> {
                     val character = dataState.data
                     _uiState.update {
                         UiState.Content(
@@ -51,21 +55,30 @@ class CharacterDetailViewModel(
                         )
                     }
                 }
-                is DataState.Error<CharacterListResponse.Character> -> {
-                    _uiState.update { UiState.Error(dataState.reason) }
+                is DataState.Error<CharacterRepository.Character> -> {
+                    _uiState.update { UiState.Error(dataState.error.message) }
                 }
             }
         }
     }
 
-    class Factory : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(CharacterDetailViewModel::class.java)) {
-                val dataSource = RickAndMortyDataSource(RickAndMortyService.create())
-                @Suppress("UNCHECKED_CAST")
-                return CharacterDetailViewModel(dataSource) as T
+    companion object {
+        val Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>,
+                extras: CreationExtras
+            ): T {
+                val application = extras[APPLICATION_KEY] as Application
+                if (modelClass.isAssignableFrom(CharacterDetailViewModel::class.java)) {
+                    val characterRepository = CharacterRepository(
+                        DbCharacterDataSource(application.applicationContext),
+                        NetworkCharacterDataSource(RickAndMortyService.create())
+                    )
+                    @Suppress("UNCHECKED_CAST")
+                    return CharacterDetailViewModel(characterRepository) as T
+                }
+                throw IllegalArgumentException("Unknown ViewModel class")
             }
-            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }
@@ -77,11 +90,11 @@ sealed class UiEvent {
 }
 
 sealed class UiState {
-    object Loading: UiState()
+    data object Loading: UiState()
 
     data class Content(val characterDetail: CharacterDetail): UiState()
 
-    data class Error(val errorMessage: String): UiState()
+    data class Error(val errorMessage: String?): UiState()
 }
 
 data class CharacterDetail(

@@ -34,7 +34,7 @@ fun CharacterListScreen(
     navigateToCharacter: (characterId: Int) -> Unit,
 ) {
     val viewModel: CharacterListViewModel = viewModel(
-        factory = CharacterListViewModel.Factory()
+        factory = CharacterListViewModel.Factory,
     )
     LaunchedEffect(key1 = true) {
         viewModel.onEvent(InitialLoad)
