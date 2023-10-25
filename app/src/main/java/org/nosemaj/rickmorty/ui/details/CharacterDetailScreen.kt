@@ -29,14 +29,11 @@ import org.nosemaj.rickmorty.ui.shared.LoadingUI
 import org.nosemaj.rickmorty.ui.shared.RemoteImage
 
 @Composable
-fun CharacterDetailScreen(
-    characterId: Int,
-    onBackPressed: () -> Unit,
-) {
+fun CharacterDetailScreen(onBackPressed: () -> Unit) {
     val viewModel: CharacterDetailViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = true) {
-        viewModel.onEvent(UiEvent.InitialLoad(characterId))
+        viewModel.onEvent(UiEvent.InitialLoad)
     }
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentState = viewState) {
@@ -46,7 +43,7 @@ fun CharacterDetailScreen(
         }
         is Error -> {
             ErrorUi(currentState.errorMessage) {
-                viewModel.onEvent(UiEvent.RetryClicked(characterId))
+                viewModel.onEvent(UiEvent.RetryClicked)
             }
         }
     }

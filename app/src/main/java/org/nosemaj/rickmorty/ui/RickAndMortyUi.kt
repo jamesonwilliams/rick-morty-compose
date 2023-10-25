@@ -25,11 +25,9 @@ fun RickAndMortApp() {
         composable(
             route = "detail/{characterId}",
             arguments = listOf(navArgument("characterId") { type = NavType.IntType }),
-        ) {navBackStackEntry ->
-            navBackStackEntry.arguments?.getInt("characterId")?.let { characterId ->
-                CharacterDetailScreen(characterId) {
-                    navController.navigateUp()
-                }
+        ) {
+            CharacterDetailScreen {
+                navController.navigateUp()
             }
         }
     }

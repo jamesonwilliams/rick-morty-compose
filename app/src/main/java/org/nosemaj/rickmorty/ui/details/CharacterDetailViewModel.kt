@@ -1,5 +1,6 @@
 package org.nosemaj.rickmorty.ui.details
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,24 +14,27 @@ import kotlinx.coroutines.withContext
 import org.nosemaj.rickmorty.data.CharacterRepository
 import org.nosemaj.rickmorty.data.DataState
 import org.nosemaj.rickmorty.ui.details.UiEvent.InitialLoad
+import org.nosemaj.rickmorty.ui.details.UiEvent.RetryClicked
 import org.nosemaj.rickmorty.ui.details.UiState.Loading
 import javax.inject.Inject
 
 @HiltViewModel
 class CharacterDetailViewModel @Inject constructor(
     private val characterRepository: CharacterRepository,
+    savedStateHandle: SavedStateHandle,
 ): ViewModel() {
+    private val characterId: Int = checkNotNull(savedStateHandle["characterId"])
     private val _uiState = MutableStateFlow<UiState>(Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     fun onEvent(uiEvent: UiEvent) {
         when (uiEvent) {
-            is InitialLoad -> loadCharacter(uiEvent.characterId)
-            is UiEvent.RetryClicked -> loadCharacter(uiEvent.characterId)
+            is InitialLoad -> loadCharacter()
+            is RetryClicked -> loadCharacter()
         }
     }
 
-    private fun loadCharacter(characterId: Int) {
+    private fun loadCharacter() {
         viewModelScope.launch {
             val dataState = withContext(Dispatchers.IO) {
                 characterRepository.getCharacter(characterId = characterId)
@@ -60,9 +64,9 @@ class CharacterDetailViewModel @Inject constructor(
 }
 
 sealed class UiEvent {
-    data class InitialLoad(val characterId: Int): UiEvent()
+    data object InitialLoad : UiEvent()
 
-    data class RetryClicked(val characterId: Int): UiEvent()
+    data object RetryClicked : UiEvent()
 }
 
 sealed class UiState {
