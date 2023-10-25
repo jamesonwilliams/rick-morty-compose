@@ -1,12 +1,8 @@
 package org.nosemaj.rickmorty.ui.list
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,14 +14,13 @@ import org.nosemaj.rickmorty.data.CharacterRepository
 import org.nosemaj.rickmorty.data.CharacterRepository.Character
 import org.nosemaj.rickmorty.data.DataState.Content
 import org.nosemaj.rickmorty.data.DataState.Error
-import org.nosemaj.rickmorty.data.db.DbCharacterDataSource
-import org.nosemaj.rickmorty.data.net.NetworkCharacterDataSource
-import org.nosemaj.rickmorty.data.net.RickAndMortyService
 import org.nosemaj.rickmorty.ui.list.UiEvent.BottomReached
 import org.nosemaj.rickmorty.ui.list.UiEvent.InitialLoad
 import org.nosemaj.rickmorty.ui.list.UiEvent.RetryClicked
+import javax.inject.Inject
 
-class CharacterListViewModel(
+@HiltViewModel
+class CharacterListViewModel @Inject constructor(
     private val characterRepository: CharacterRepository,
 ): ViewModel() {
     private val _uiState = MutableStateFlow(UiState.INITIAL)
@@ -64,26 +59,6 @@ class CharacterListViewModel(
                         )
                     }
                 }
-            }
-        }
-    }
-
-    companion object {
-        val Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>,
-                extras: CreationExtras
-            ): T {
-                val application = extras[APPLICATION_KEY] as Application
-                if (modelClass.isAssignableFrom(CharacterListViewModel::class.java)) {
-                    val characterRepository = CharacterRepository(
-                        DbCharacterDataSource(application.applicationContext),
-                        NetworkCharacterDataSource(RickAndMortyService.create())
-                    )
-                    @Suppress("UNCHECKED_CAST")
-                    return CharacterListViewModel(characterRepository) as T
-                }
-                throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
     }

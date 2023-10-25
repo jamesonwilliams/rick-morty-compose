@@ -2,7 +2,6 @@ package org.nosemaj.rickmorty.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 
 @Database(
     entities = [DbCharacter::class],

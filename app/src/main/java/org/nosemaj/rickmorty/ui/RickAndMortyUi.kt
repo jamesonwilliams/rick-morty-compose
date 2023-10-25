@@ -10,7 +10,6 @@ import androidx.navigation.navArgument
 import org.nosemaj.rickmorty.ui.details.CharacterDetailScreen
 import org.nosemaj.rickmorty.ui.list.CharacterListScreen
 
-
 @Composable
 fun RickAndMortApp() {
     val navController: NavHostController = rememberNavController()

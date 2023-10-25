@@ -6,8 +6,9 @@ import org.nosemaj.rickmorty.data.db.DbCharacter
 import org.nosemaj.rickmorty.data.db.DbCharacterDataSource
 import org.nosemaj.rickmorty.data.net.CharacterListResponse
 import org.nosemaj.rickmorty.data.net.NetworkCharacterDataSource
+import javax.inject.Inject
 
-class CharacterRepository(
+class CharacterRepository @Inject constructor(
     private val dbCharacterDataSource: DbCharacterDataSource,
     private val networkCharacterDataSource: NetworkCharacterDataSource,
 ) {

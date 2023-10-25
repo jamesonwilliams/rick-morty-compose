@@ -3,8 +3,9 @@ package org.nosemaj.rickmorty.data.db
 import android.content.Context
 import androidx.room.Room
 import org.nosemaj.rickmorty.data.DataState
+import javax.inject.Inject
 
-class DbCharacterDataSource(applicationContext: Context) {
+class DbCharacterDataSource @Inject constructor(applicationContext: Context) {
     private val db = Room.databaseBuilder(
         applicationContext,
         AppDatabase::class.java,

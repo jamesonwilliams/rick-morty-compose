@@ -20,8 +20,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign.Companion.Right
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import org.nosemaj.rickmorty.ui.list.UiEvent.BottomReached
 import org.nosemaj.rickmorty.ui.list.UiEvent.InitialLoad
 import org.nosemaj.rickmorty.ui.list.UiEvent.RetryClicked
@@ -33,9 +33,8 @@ import org.nosemaj.rickmorty.ui.shared.RemoteImage
 fun CharacterListScreen(
     navigateToCharacter: (characterId: Int) -> Unit,
 ) {
-    val viewModel: CharacterListViewModel = viewModel(
-        factory = CharacterListViewModel.Factory,
-    )
+    val viewModel: CharacterListViewModel = hiltViewModel()
+
     LaunchedEffect(key1 = true) {
         viewModel.onEvent(InitialLoad)
     }

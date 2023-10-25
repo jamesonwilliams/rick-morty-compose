@@ -1,10 +1,10 @@
 package org.nosemaj.rickmorty.data.net
 
-import android.util.Log
 import org.nosemaj.rickmorty.data.DataState
 import retrofit2.Response
+import javax.inject.Inject
 
-class NetworkCharacterDataSource(
+class NetworkCharacterDataSource @Inject constructor(
     private val service: RickAndMortyService,
 ) {
     suspend fun listCharacters(page: Int): DataState<CharacterListResponse> {

@@ -19,8 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import org.nosemaj.rickmorty.ui.details.UiState.Content
 import org.nosemaj.rickmorty.ui.details.UiState.Error
 import org.nosemaj.rickmorty.ui.details.UiState.Loading
@@ -33,9 +33,8 @@ fun CharacterDetailScreen(
     characterId: Int,
     onBackPressed: () -> Unit,
 ) {
-    val viewModel: CharacterDetailViewModel = viewModel(
-        factory = CharacterDetailViewModel.Factory,
-    )
+    val viewModel: CharacterDetailViewModel = hiltViewModel()
+
     LaunchedEffect(key1 = true) {
         viewModel.onEvent(UiEvent.InitialLoad(characterId))
     }
