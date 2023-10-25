@@ -29,7 +29,9 @@ class CharacterListViewModel @Inject constructor(
     fun onEvent(event: UiEvent) {
         when (event) {
             is RetryClicked -> refreshUi()
-            is InitialLoad -> refreshUi()
+            is InitialLoad -> if (uiState.value.displayState == DisplayState.LOADING) {
+                refreshUi()
+            }
             is BottomReached -> refreshUi(showLoading = false)
         }
     }

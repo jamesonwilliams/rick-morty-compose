@@ -29,8 +29,6 @@ reference does this too, but is a more complex example.)
 - [Hilt](https://developer.android.com/training/dependency-injection/hilt-android) with [KSP](https://dagger.dev/dev-guide/ksp.html)
 
 ## To do
-- Positional restoration on rotation and network retry
 - Broader and more elegant use of MaterialTheme
 - Tests
-
 
