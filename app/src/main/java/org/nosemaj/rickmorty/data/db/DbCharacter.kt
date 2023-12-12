@@ -11,5 +11,5 @@ data class DbCharacter(
     val status: String,
     val species: String,
     val gender: String,
-    val image: String,
+    val image: String
 )

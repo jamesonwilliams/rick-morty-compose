@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,13 +17,12 @@ import org.nosemaj.rickmorty.data.DataState
 import org.nosemaj.rickmorty.ui.details.UiEvent.InitialLoad
 import org.nosemaj.rickmorty.ui.details.UiEvent.RetryClicked
 import org.nosemaj.rickmorty.ui.details.UiState.Loading
-import javax.inject.Inject
 
 @HiltViewModel
 class CharacterDetailViewModel @Inject constructor(
     private val characterRepository: CharacterRepository,
-    savedStateHandle: SavedStateHandle,
-): ViewModel() {
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
     private val characterId: Int = checkNotNull(savedStateHandle["characterId"])
     private val _uiState = MutableStateFlow<UiState>(Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -50,7 +50,7 @@ class CharacterDetailViewModel @Inject constructor(
                                 imageUrl = character.image,
                                 status = character.status,
                                 species = character.species,
-                                gender = character.gender,
+                                gender = character.gender
                             )
                         )
                     }
@@ -70,11 +70,11 @@ sealed class UiEvent {
 }
 
 sealed class UiState {
-    data object Loading: UiState()
+    data object Loading : UiState()
 
-    data class Content(val characterDetail: CharacterDetail): UiState()
+    data class Content(val characterDetail: CharacterDetail) : UiState()
 
-    data class Error(val errorMessage: String?): UiState()
+    data class Error(val errorMessage: String?) : UiState()
 }
 
 data class CharacterDetail(
@@ -83,5 +83,5 @@ data class CharacterDetail(
     val imageUrl: String,
     val status: String,
     val species: String,
-    val gender: String,
+    val gender: String
 )

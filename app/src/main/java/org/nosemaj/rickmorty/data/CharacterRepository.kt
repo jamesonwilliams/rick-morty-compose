@@ -1,16 +1,16 @@
 package org.nosemaj.rickmorty.data
 
+import javax.inject.Inject
 import org.nosemaj.rickmorty.data.DataState.Content
 import org.nosemaj.rickmorty.data.DataState.Error
 import org.nosemaj.rickmorty.data.db.DbCharacter
 import org.nosemaj.rickmorty.data.db.DbCharacterDataSource
 import org.nosemaj.rickmorty.data.net.CharacterListResponse
 import org.nosemaj.rickmorty.data.net.NetworkCharacterDataSource
-import javax.inject.Inject
 
 class CharacterRepository @Inject constructor(
     private val dbCharacterDataSource: DbCharacterDataSource,
-    private val networkCharacterDataSource: NetworkCharacterDataSource,
+    private val networkCharacterDataSource: NetworkCharacterDataSource
 ) {
     suspend fun loadCharacters(page: Int): DataState<List<Character>> {
         when (val dbResult = dbCharacterDataSource.loadPageOfCharacters(page = page)) {
@@ -24,13 +24,19 @@ class CharacterRepository @Inject constructor(
     }
 
     suspend fun getCharacter(characterId: Int): DataState<Character> {
-        return when (val dbResult = dbCharacterDataSource.loadCharacterById(characterId = characterId)) {
+        return when (
+            val dbResult = dbCharacterDataSource.loadCharacterById(
+                characterId = characterId
+            )
+        ) {
             is Error<DbCharacter> -> Error(dbResult.error)
             is Content<DbCharacter> -> return Content(dbResult.data.asCharacter())
         }
     }
 
-    private suspend fun save(networkCharacters: List<CharacterListResponse.Result>): DataState<List<Character>> {
+    private suspend fun save(
+        networkCharacters: List<CharacterListResponse.Result>
+    ): DataState<List<Character>> {
         val characters = networkCharacters.map { it.asCharacter() }
         val dbCharacters = characters.map { it.asDbCharacter() }.toTypedArray()
         return when (val result = dbCharacterDataSource.storeCharacters(*dbCharacters)) {
@@ -46,7 +52,7 @@ class CharacterRepository @Inject constructor(
             status = status,
             species = species,
             gender = gender,
-            image = image,
+            image = image
         )
     }
 
@@ -57,7 +63,7 @@ class CharacterRepository @Inject constructor(
             status = status,
             species = species,
             gender = gender,
-            image = image,
+            image = image
         )
     }
 
@@ -68,7 +74,7 @@ class CharacterRepository @Inject constructor(
             status = status,
             species = species,
             gender = gender,
-            image = image,
+            image = image
         )
     }
 
@@ -78,6 +84,6 @@ class CharacterRepository @Inject constructor(
         val status: String,
         val species: String,
         val gender: String,
-        val image: String,
+        val image: String
     )
 }

@@ -50,17 +50,14 @@ fun CharacterDetailScreen(onBackPressed: () -> Unit) {
 }
 
 @Composable
-fun CharacterDetailUi(
-    characterDetail: CharacterDetail,
-    onBackClicked: () -> Unit,
-) {
+fun CharacterDetailUi(characterDetail: CharacterDetail, onBackClicked: () -> Unit) {
     Column(
-      modifier = Modifier.fillMaxHeight()
+        modifier = Modifier.fillMaxHeight()
     ) {
         Box {
             RemoteImage(
                 imageUrl = characterDetail.imageUrl,
-                contentDescription = characterDetail.name,
+                contentDescription = characterDetail.name
             )
             BackBar {
                 onBackClicked()
@@ -91,7 +88,7 @@ fun TitleLine(text: String) {
 fun DetailLine(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleLarge,
+        style = MaterialTheme.typography.titleLarge
     )
 }
 

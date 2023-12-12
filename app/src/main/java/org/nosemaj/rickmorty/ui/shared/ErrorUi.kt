@@ -14,10 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ErrorUi(
-    message: String?,
-    onRetryClicked: () -> Unit,
-) {
+fun ErrorUi(message: String?, onRetryClicked: () -> Unit) {
     Column(
         modifier = Modifier
             .padding(20.dp)
@@ -29,7 +26,7 @@ fun ErrorUi(
         Text(errorMessage, fontSize = 20.sp)
         Spacer(modifier = Modifier.padding(10.dp))
         Button(
-            onClick = onRetryClicked,
+            onClick = onRetryClicked
         ) {
             Text("Retry?")
         }

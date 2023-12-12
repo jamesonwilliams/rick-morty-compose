@@ -2,8 +2,8 @@ package org.nosemaj.rickmorty.data.db
 
 import android.content.Context
 import androidx.room.Room
-import org.nosemaj.rickmorty.data.DataState
 import javax.inject.Inject
+import org.nosemaj.rickmorty.data.DataState
 
 class DbCharacterDataSource @Inject constructor(applicationContext: Context) {
     private val db = Room.databaseBuilder(
@@ -22,9 +22,9 @@ class DbCharacterDataSource @Inject constructor(applicationContext: Context) {
         }
     }
 
-    suspend fun loadPageOfCharacters(page: Int): DataState<List<DbCharacter>>  {
+    suspend fun loadPageOfCharacters(page: Int): DataState<List<DbCharacter>> {
         return try {
-            val ids = ((page - 1) * 20 + 1 .. page * 20).toSet().toIntArray()
+            val ids = ((page - 1) * 20 + 1..page * 20).toSet().toIntArray()
             val characters = db.characterDao().loadAllByIds(ids).sortedBy { it.id }
             if (characters.isEmpty()) {
                 return DataState.Error(
@@ -33,7 +33,6 @@ class DbCharacterDataSource @Inject constructor(applicationContext: Context) {
             } else {
                 return DataState.Content(characters)
             }
-
         } catch (thr: Throwable) {
             DataState.Error(
                 Throwable("Unable to fetch characters for page $page.", thr)

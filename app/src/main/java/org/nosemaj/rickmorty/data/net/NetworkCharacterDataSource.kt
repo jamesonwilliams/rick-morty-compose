@@ -1,16 +1,16 @@
 package org.nosemaj.rickmorty.data.net
 
+import javax.inject.Inject
 import org.nosemaj.rickmorty.data.DataState
 import retrofit2.Response
-import javax.inject.Inject
 
 class NetworkCharacterDataSource @Inject constructor(
-    private val service: RickAndMortyService,
+    private val service: RickAndMortyService
 ) {
     suspend fun listCharacters(page: Int): DataState<CharacterListResponse> {
         return fetch(
             "No more characters found.",
-            "Error retrieving characters.",
+            "Error retrieving characters."
         ) {
             service.listCharacters(page)
         }
@@ -19,7 +19,7 @@ class NetworkCharacterDataSource @Inject constructor(
     private suspend fun <T> fetch(
         noDataMessage: String,
         unsuccessfulMessage: String,
-        loadData: suspend () -> Response<T>,
+        loadData: suspend () -> Response<T>
     ): DataState<T> {
         return try {
             val response = loadData()

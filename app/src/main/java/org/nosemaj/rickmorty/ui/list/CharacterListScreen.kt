@@ -30,9 +30,7 @@ import org.nosemaj.rickmorty.ui.shared.LoadingUI
 import org.nosemaj.rickmorty.ui.shared.RemoteImage
 
 @Composable
-fun CharacterListScreen(
-    navigateToCharacter: (characterId: Int) -> Unit,
-) {
+fun CharacterListScreen(navigateToCharacter: (characterId: Int) -> Unit) {
     val viewModel: CharacterListViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = true) {
@@ -66,7 +64,7 @@ fun CharacterListScreen(
 fun CharacterList(
     characterSummaries: List<CharacterSummary>,
     onBottomReached: () -> Unit,
-    onCharacterClicked: (CharacterSummary) -> Unit,
+    onCharacterClicked: (CharacterSummary) -> Unit
 ) {
     val columnCount = when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> 4
@@ -90,7 +88,7 @@ fun CharacterList(
 fun CharacterItem(
     characterSummary: CharacterSummary,
     modifier: Modifier = Modifier,
-    onClicked: () -> Unit,
+    onClicked: () -> Unit
 ) {
     Box(
         modifier = modifier.clickable { onClicked() }

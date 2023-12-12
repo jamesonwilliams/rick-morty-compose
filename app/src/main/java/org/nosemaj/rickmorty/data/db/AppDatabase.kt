@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 @Database(
     entities = [DbCharacter::class],
     version = 1,
-    exportSchema = false,
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun characterDao(): DbCharacterDao
