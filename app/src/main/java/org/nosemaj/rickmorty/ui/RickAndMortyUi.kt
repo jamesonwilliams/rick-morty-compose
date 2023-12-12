@@ -19,7 +19,7 @@ fun RickAndMortApp() {
     ) {
         composable("list") {
             CharacterListScreen { characterId ->
-                navController.navigate("detail/${characterId}")
+                navController.navigate("detail/$characterId")
             }
         }
         composable(
