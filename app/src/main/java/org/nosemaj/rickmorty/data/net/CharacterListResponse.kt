@@ -1,14 +1,13 @@
 package org.nosemaj.rickmorty.data.net
 
+import com.squareup.moshi.JsonClass
 
-import kotlinx.serialization.Serializable
-
-@Serializable
+@JsonClass(generateAdapter = true)
 data class CharacterListResponse(
     val info: Info,
     val results: List<Result>
 ) {
-    @Serializable
+    @JsonClass(generateAdapter = true)
     data class Info(
         val count: Int,
         val next: String?,
@@ -16,7 +15,7 @@ data class CharacterListResponse(
         val prev: String?
     )
 
-    @Serializable
+    @JsonClass(generateAdapter = true)
     data class Result(
         val created: String,
         val episode: List<String>,
@@ -31,13 +30,13 @@ data class CharacterListResponse(
         val type: String,
         val url: String
     ) {
-        @Serializable
+        @JsonClass(generateAdapter = true)
         data class Location(
             val name: String,
             val url: String
         )
 
-        @Serializable
+        @JsonClass(generateAdapter = true)
         data class Origin(
             val name: String,
             val url: String
