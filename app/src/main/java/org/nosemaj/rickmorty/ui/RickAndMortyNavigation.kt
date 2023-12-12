@@ -11,7 +11,7 @@ import org.nosemaj.rickmorty.ui.details.CharacterDetailScreen
 import org.nosemaj.rickmorty.ui.list.CharacterListScreen
 
 @Composable
-fun RickAndMortApp() {
+fun RickAndMortNavigation() {
     val navController: NavHostController = rememberNavController()
     NavHost(
         navController = navController,

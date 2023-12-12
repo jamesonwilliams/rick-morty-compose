@@ -12,9 +12,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.nosemaj.rickmorty.data.CharacterRepository
-import org.nosemaj.rickmorty.data.CharacterRepository.Character
-import org.nosemaj.rickmorty.data.DataState.Content
-import org.nosemaj.rickmorty.data.DataState.Error
 import org.nosemaj.rickmorty.ui.list.UiEvent.BottomReached
 import org.nosemaj.rickmorty.ui.list.UiEvent.InitialLoad
 import org.nosemaj.rickmorty.ui.list.UiEvent.RetryClicked
@@ -41,20 +38,11 @@ class CharacterListViewModel @Inject constructor(
             _uiState.update { it.copy(displayState = DisplayState.LOADING) }
         }
         viewModelScope.launch {
-            val dataState = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 characterRepository.loadCharacters(uiState.value.currentPage)
             }
-            when (dataState) {
-                is Error<List<Character>> -> {
-                    _uiState.update {
-                        it.copy(
-                            displayState = DisplayState.ERROR,
-                            errorMessage = dataState.error.message
-                        )
-                    }
-                }
-                is Content<List<Character>> -> {
-                    val characterSummaries = dataState.data
+                .onSuccess { characters ->
+                    val characterSummaries = characters
                         .map { CharacterSummary(id = it.id, name = it.name, imageUrl = it.image) }
                     _uiState.update {
                         it.copy(
@@ -64,7 +52,14 @@ class CharacterListViewModel @Inject constructor(
                         )
                     }
                 }
-            }
+                .onFailure { error ->
+                    _uiState.update {
+                        it.copy(
+                            displayState = DisplayState.ERROR,
+                            errorMessage = error.message
+                        )
+                    }
+                }
         }
     }
 }
@@ -72,7 +67,6 @@ class CharacterListViewModel @Inject constructor(
 sealed class UiEvent {
     data object InitialLoad : UiEvent()
     data object RetryClicked : UiEvent()
-
     data object BottomReached : UiEvent()
 }
 

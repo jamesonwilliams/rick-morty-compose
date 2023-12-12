@@ -1,13 +1,13 @@
 package org.nosemaj.rickmorty.data.net
 
 import javax.inject.Inject
-import org.nosemaj.rickmorty.data.DataState
+import org.nosemaj.rickmorty.data.CharacterModel
 import retrofit2.Response
 
 class NetworkCharacterDataSource @Inject constructor(
     private val service: RickAndMortyService
 ) {
-    suspend fun listCharacters(page: Int): DataState<CharacterListResponse> {
+    suspend fun listCharacters(page: Int): Result<CharacterListResponse> {
         return fetch(
             "No more characters found.",
             "Error retrieving characters."
@@ -16,28 +16,30 @@ class NetworkCharacterDataSource @Inject constructor(
         }
     }
 
+    suspend fun getCharacter(characterId: Int): Result<CharacterModel> {
+        return fetch(
+            "No character $characterId found",
+            "Error retrieving character $characterId"
+        ) {
+            service.getCharacter(characterId)
+        }
+    }
+
     private suspend fun <T> fetch(
         noDataMessage: String,
         unsuccessfulMessage: String,
         loadData: suspend () -> Response<T>
-    ): DataState<T> {
+    ): Result<T> {
         return try {
             val response = loadData()
             if (response.isSuccessful) {
-                response.body()?.let { data ->
-                    DataState.Content(data)
-                } ?: DataState.Error(
-                    Throwable(noDataMessage)
-                )
+                response.body()?.let { data -> Result.success(data) }
+                    ?: Result.failure(Throwable(noDataMessage))
             } else {
-                DataState.Error(
-                    Throwable(unsuccessfulMessage)
-                )
+                Result.failure(Throwable(unsuccessfulMessage))
             }
         } catch (thr: Throwable) {
-            DataState.Error(
-                Throwable("Bad network connectivity.", thr)
-            )
+            Result.failure(Throwable("Bad network connectivity.", thr))
         }
     }
 }

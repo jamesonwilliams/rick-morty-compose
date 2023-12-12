@@ -3,52 +3,44 @@ package org.nosemaj.rickmorty.data.db
 import android.content.Context
 import androidx.room.Room
 import javax.inject.Inject
-import org.nosemaj.rickmorty.data.DataState
+import org.nosemaj.rickmorty.data.CharacterModel
 
 class DbCharacterDataSource @Inject constructor(applicationContext: Context) {
     private val db = Room.databaseBuilder(
         applicationContext,
         AppDatabase::class.java,
-        "RickAndMorty"
+        AppDatabase::class.simpleName
     ).build()
 
-    suspend fun loadCharacterById(characterId: Int): DataState<DbCharacter> {
+    suspend fun loadCharacterById(characterId: Int): Result<CharacterModel> {
         return try {
-            DataState.Content(db.characterDao().loadById(characterId))
+            Result.success(db.characterDao().loadById(characterId))
         } catch (thr: Throwable) {
-            DataState.Error(
-                Throwable("Unable to get character $characterId from DB.", thr)
-            )
+            Result.failure(Throwable("Unable to get character $characterId from DB.", thr))
         }
     }
 
-    suspend fun loadPageOfCharacters(page: Int): DataState<List<DbCharacter>> {
+    suspend fun loadPageOfCharacters(page: Int): Result<List<CharacterModel>> {
         return try {
             val ids = ((page - 1) * 20 + 1..page * 20).toSet().toIntArray()
             val characters = db.characterDao().loadAllByIds(ids).sortedBy { it.id }
             if (characters.isEmpty()) {
-                return DataState.Error(
-                    Throwable("No characters found for page $page.")
-                )
+                return Result.failure(Throwable("No characters found for page $page."))
             } else {
-                return DataState.Content(characters)
+                return Result.success(characters)
             }
         } catch (thr: Throwable) {
-            DataState.Error(
-                Throwable("Unable to fetch characters for page $page.", thr)
-            )
+            Result.failure(Throwable("Unable to fetch characters for page $page.", thr))
         }
     }
 
-    suspend fun storeCharacters(vararg dbCharacter: DbCharacter): DataState<List<DbCharacter>> {
+    suspend fun storeCharacters(vararg dbCharacter: CharacterModel): Result<List<CharacterModel>> {
         return try {
             db.characterDao().insertAll(*dbCharacter)
-            DataState.Content(dbCharacter.toList())
+            Result.success(dbCharacter.toList())
         } catch (thr: Throwable) {
             val ids = dbCharacter.map { it.id }
-            DataState.Error(
-                Throwable("Unable to insert characters $ids to database.", thr)
-            )
+            Result.failure(Throwable("Unable to insert characters $ids to database.", thr))
         }
     }
 }

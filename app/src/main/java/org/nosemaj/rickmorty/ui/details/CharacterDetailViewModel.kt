@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.nosemaj.rickmorty.data.CharacterRepository
-import org.nosemaj.rickmorty.data.DataState
 import org.nosemaj.rickmorty.ui.details.UiEvent.InitialLoad
 import org.nosemaj.rickmorty.ui.details.UiEvent.RetryClicked
 import org.nosemaj.rickmorty.ui.details.UiState.Loading
@@ -36,12 +35,10 @@ class CharacterDetailViewModel @Inject constructor(
 
     private fun loadCharacter() {
         viewModelScope.launch {
-            val dataState = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 characterRepository.getCharacter(characterId = characterId)
             }
-            when (dataState) {
-                is DataState.Content<CharacterRepository.Character> -> {
-                    val character = dataState.data
+                .onSuccess { character ->
                     _uiState.update {
                         UiState.Content(
                             CharacterDetail(
@@ -55,25 +52,21 @@ class CharacterDetailViewModel @Inject constructor(
                         )
                     }
                 }
-                is DataState.Error<CharacterRepository.Character> -> {
-                    _uiState.update { UiState.Error(dataState.error.message) }
+                .onFailure { error ->
+                    _uiState.update { UiState.Error(error.message) }
                 }
-            }
         }
     }
 }
 
 sealed class UiEvent {
     data object InitialLoad : UiEvent()
-
     data object RetryClicked : UiEvent()
 }
 
 sealed class UiState {
     data object Loading : UiState()
-
     data class Content(val characterDetail: CharacterDetail) : UiState()
-
     data class Error(val errorMessage: String?) : UiState()
 }
 
